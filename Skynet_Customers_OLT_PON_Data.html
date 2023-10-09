@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Skynet OLT PONs Data</title>
+    <style>
+        /* Add your mobile-friendly styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+        }
+        .page-button {
+            padding: 5px 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Skynet OLT PONs Data</h1>
+    <input type="text" id="search" placeholder="Search...">
+    <table id="data-table">
+        <!-- Table content will be generated using JavaScript -->
+    </table>
+    <div class="pagination" id="pagination">
+        <!-- Pagination buttons will be generated using JavaScript -->
+    </div>
+
+    <script>
+        const table = document.getElementById("data-table");
+        const pagination = document.getElementById("pagination");
+        const searchInput = document.getElementById("search");
+        const rowsPerPage = 25;
+        let currentPage = 1;
+        let filteredData = [];
+        let csvData = [];
+
+        // Load and display the CSV data
+        function loadData() {
+            fetch('oltdata_mcn.csv')
+                .then(response => response.text())
+                .then(data => {
+                    // Parse CSV data
+                    csvData = data.split('\n').map(row => row.split(','));
+                    const headers = csvData[0];
+
+                    // Remove the header row
+                    csvData.shift();
+
+                    // Store the filtered data for searching
+                    filteredData = csvData;
+
+                    // Create table header
+                    const headerRow = document.createElement('tr');
+                    headers.forEach(header => {
+                        const th = document.createElement('th');
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                    table.appendChild(headerRow);
+
+                    // Display the first page of data
+                    showPage(currentPage);
+                })
+                .catch(error => console.error('Error loading CSV data:', error));
+        }
+
+        // Display a specific page of data
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            // Clear the existing table rows
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            // Populate the table with the data for the current page
+            pageData.forEach(rowData => {
+                const row = document.createElement('tr');
+                rowData.forEach(cellData => {
+                    const cell = document.createElement('td');
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
+                });
+                table.appendChild(row);
+            });
+
+            // Generate pagination buttons
+            generatePaginationButtons();
+        }
+
+        // Generate pagination buttons based on the data and current page
+        function generatePaginationButtons() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+            // Clear existing pagination buttons
+            while (pagination.firstChild) {
+                pagination.removeChild(pagination.firstChild);
+            }
+
+            // Create "Previous Page" button
+            const prevButton = document.createElement('span');
+            prevButton.className = "page-button";
+            prevButton.textContent = "Previous Page";
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    showPage(currentPage);
+                }
+            });
+            pagination.appendChild(prevButton);
+
+            // Create numbered page buttons
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('span');
+                pageButton.className = "page-button";
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    showPage(currentPage);
+                });
+                pagination.appendChild(pageButton);
+            }
+
+            // Create "Next Page" button
+            const nextButton = document.createElement('span');
+            nextButton.className = "page-button";
+            nextButton.textContent = "Next Page";
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    showPage(currentPage);
+                }
+            });
+            pagination.appendChild(nextButton);
+        }
+
+        // Handle search input
+        searchInput.addEventListener('input', () => {
+            const searchText = searchInput.value.toLowerCase();
+            filteredData = searchText
+                ? csvData.filter(row => row.slice(0, 4).some(cell => cell.toLowerCase().includes(searchText)))
+                : csvData;
+            currentPage = 1;
+            showPage(currentPage);
+
+            // Clear the search input if it's empty
+            if (!searchText) {
+                searchInput.value = "";
+            }
+        });
+
+        // Handle backspace key in the search input
+searchInput.addEventListener('keydown', (event) => {
+    if (event.key === "Backspace") {
+        const searchText = searchInput.value.toLowerCase();
+        filteredData = searchText
+            ? csvData.filter(row => row.slice(0, 4).some(cell => cell.toLowerCase().includes(searchText)))
+            : csvData;
+        currentPage = 1;
+        showPage(currentPage);
+    }
+});
+
+        // Initialize the data table
+        loadData();
+    </script>
+</body>
+</html>

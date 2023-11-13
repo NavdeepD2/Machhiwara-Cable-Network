@@ -1,10 +1,11 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import pandas as pd
 from datetime import datetime
+import os
 
 def open_file(button_id):
-    file_path = filedialog.askopenfilename(filetypes=[('Excel Files', '*.xlsx')])
+    file_path = filedialog.askopenfilename(filetypes=[('Excel Files', '*.xlsx;*.xls')])
     if file_path:
         if button_id == 1:
             global file_a_path
@@ -13,10 +14,22 @@ def open_file(button_id):
             global file_b_path
             file_b_path = file_path
 
+def convert_xls_to_xlsx():
+    xls_file_path = filedialog.askopenfilename(filetypes=[('Excel Files', '*.xls')])
+    if xls_file_path:
+        # Read the xls file
+        df = pd.read_excel(xls_file_path)
+
+        # Save as xlsx with the original name plus "_conv"
+        output_path = os.path.splitext(xls_file_path)[0] + "_conv.xlsx"
+        df.to_excel(output_path, index=False)
+
+        messagebox.showinfo("Conversion Successful", f"File converted and saved as {output_path}")
+
 def compare_files():
     if file_a_path and file_b_path:
-        df_a = pd.read_excel(file_a_path, sheet_name='CustomerReportportrait', header=1)
-        df_b = pd.read_excel(file_b_path, sheet_name='CustomerReportportrait', header=1)
+        df_a = pd.read_excel(file_a_path, sheet_name='Sheet1', header=1)
+        df_b = pd.read_excel(file_b_path, sheet_name='Sheet1', header=1)
 
         merged_df = pd.merge(df_a, df_b, on='Cust ID', suffixes=('_Before', '_After'))
 
@@ -38,6 +51,11 @@ file_a_path = None
 file_b_path = None
 
 # Buttons
+
+convert_button = tk.Button(root, text="Convert XLS to XLSX", command=convert_xls_to_xlsx)
+convert_button.pack(pady=10)
+
+
 before_button = tk.Button(root, text="Before", command=lambda: open_file(1))
 before_button.pack(pady=10)
 

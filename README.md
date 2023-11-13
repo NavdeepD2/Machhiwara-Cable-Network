@@ -10,4 +10,5 @@ cd Verify Monthly Utility
 
 python Compare_Customers_Balance.py
 
-![image](https://github.com/NavdeepD2/Machhiwara-Cable-Network/assets/32217733/fa314c59-9762-460b-ba40-1ec62d4169af)
+![image](https://github.com/NavdeepD2/Machhiwara-Cable-Network/assets/32217733/f39eaee0-a189-48dc-9df1-b166e8b96942)
+

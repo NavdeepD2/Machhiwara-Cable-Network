@@ -40,12 +40,14 @@ def compare_files():
             matched_rows.to_excel(writer, index=False, sheet_name='DifferentRows')
 
         print(f"Comparison result saved to {output_file}")
+        messagebox.showinfo("Comparison Successful", f"Comparison result saved to {output_file}")
     else:
         print("Please select both files before comparing.")
 
 # GUI setup
 root = tk.Tk()
 root.title("Excel File Comparator")
+root.geometry("220x220")
 
 file_a_path = None
 file_b_path = None

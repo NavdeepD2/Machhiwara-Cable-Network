@@ -6,4 +6,6 @@ python calculate_daily_payment_collection.py
 
 # Compare Customers Balance After Monthly Utility
 
-python Verify Monthly Utility/Compare_Customers_Balance.py
+cd Verify Monthly Utility
+
+python Compare_Customers_Balance.py

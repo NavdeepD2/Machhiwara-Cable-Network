@@ -1,0 +1,24 @@
+# config 
+
+conf t
+interface gpon-olt_1/2/7
+no onu 5
+exit
+exit
+
+conf t
+interface gpon-olt_1/2/7
+onu 5 type ABCD sn ZTEGCDF1063E
+exit
+interface gpon-onu_1/2/7:5
+tcont 1 profile 1G
+gemport 1 tcont 1
+service-port 1 vport 1 user-vlan 721 vlan 721
+exit
+pon-onu-mng gpon-onu_1/2/7:5
+service hsi gemport 1 vlan 721 
+wan-ip 1 mode pppoe username ftth.loharian.ajay500960 password cust123 vlan-profile HSI721 host 1
+exit
+exit
+write
+exit
